@@ -98,8 +98,10 @@ class slam_model_asr(slam_model):
         device = kwargs.get("device", "cuda")
         if os.path.exists(wav_path):  # Audio-Text QA
             import whisper
+            from slam_llm.enhancement import enhance_audio
 
             audio_raw = whisper.load_audio(wav_path)
+            audio_raw, _ = enhance_audio(audio_raw, sample_rate=16000)
             audio_raw = whisper.pad_or_trim(audio_raw)
 
             mel_size = getattr(
