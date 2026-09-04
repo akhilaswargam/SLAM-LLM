@@ -213,6 +213,8 @@ class NoiseEnhancer:
             input_path = audio_or_path
             wav, sr = self.load_audio(audio_or_path, target_sr=sample_rate)
         else:
+            if hasattr(audio_or_path, "detach"):
+                audio_or_path = audio_or_path.detach().cpu().numpy()
             wav = np.asarray(audio_or_path, dtype=np.float32)
             sr = sample_rate
 
@@ -226,8 +228,7 @@ class NoiseEnhancer:
             enhanced_wav = self.reduce_noise(wav, sr)
             enhancement_applied = True
             snr_after, _, _, _ = self.analyze_noise(enhanced_wav, sr)
-            # Denoising should typically show positive or equal SNR improvement
-            snr_after = max(snr_after, snr_before + 1.5)
+            snr_after = float(snr_after)
         else:
             enhanced_wav = wav.copy()
             snr_after = snr_before
