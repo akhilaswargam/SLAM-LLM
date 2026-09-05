@@ -21,6 +21,7 @@ def parse_args():
     parser.add_argument("--output", "-o", type=str, default=None, help="Path to save enhanced audio WAV")
     parser.add_argument("--threshold", "-t", type=float, default=20.0, help="Clean SNR threshold (dB)")
     parser.add_argument("--force", "-f", action="store_true", help="Force enhancement even if detected clean")
+    parser.add_argument("--disable", action="store_true", help="Disable enhancement (pure passthrough)")
     return parser.parse_args()
 
 
@@ -36,7 +37,7 @@ def main():
         base, ext = os.path.splitext(args.input)
         output_path = f"{base}_enhanced{ext or '.wav'}"
 
-    enhancer = NoiseEnhancer(snr_clean_threshold_db=args.threshold)
+    enhancer = NoiseEnhancer(snr_clean_threshold_db=args.threshold, enabled=not args.disable)
     _, result = enhancer.enhance(
         audio_or_path=args.input,
         output_path=output_path,
