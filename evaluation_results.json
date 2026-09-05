@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-05 12:06:07",
+  "timestamp": "2026-09-05 12:18:20",
   "method": "Adaptive Spectral Gating with Formant Protection",
   "clean_threshold_db": 20.0,
   "asr_evaluation_status": "BLOCKED - missing required dependencies/checkpoints: torch, whisper",
@@ -8,7 +8,15 @@
     "conditions_enhanced": 4,
     "clean_or_low_bypassed": 2,
     "mean_snr_gain_enhanced_db": 3.28,
-    "mean_latency_sec": 0.0142,
+    "min_delta_snr_db": 2.92,
+    "max_delta_snr_db": 3.71,
+    "ref_correlation_range": [
+      0.8916,
+      1.0
+    ],
+    "conditions_clipped": 2,
+    "mean_latency_sec": 0.0177,
+    "real_time_factor": 0.00591,
     "asr_evaluation_status": "BLOCKED - missing required dependencies/checkpoints: torch, whisper"
   },
   "conditions": [
@@ -26,7 +34,7 @@
       "is_clipped": false,
       "sample_rate": 16000,
       "duration_sec": 3.0,
-      "processing_time_sec": 0.0158
+      "processing_time_sec": 0.0171
     },
     {
       "condition": "Low Stationary (~22 dB)",
@@ -42,7 +50,7 @@
       "is_clipped": false,
       "sample_rate": 16000,
       "duration_sec": 3.0,
-      "processing_time_sec": 0.0041
+      "processing_time_sec": 0.006
     },
     {
       "condition": "Moderate Stationary (~12 dB)",
@@ -58,7 +66,7 @@
       "is_clipped": false,
       "sample_rate": 16000,
       "duration_sec": 3.0,
-      "processing_time_sec": 0.0186
+      "processing_time_sec": 0.0197
     },
     {
       "condition": "Strong Stationary (~3 dB)",
@@ -74,7 +82,7 @@
       "is_clipped": true,
       "sample_rate": 16000,
       "duration_sec": 3.0,
-      "processing_time_sec": 0.0144
+      "processing_time_sec": 0.0151
     },
     {
       "condition": "Non-Stationary (~8 dB)",
@@ -90,7 +98,7 @@
       "is_clipped": true,
       "sample_rate": 16000,
       "duration_sec": 3.0,
-      "processing_time_sec": 0.0155
+      "processing_time_sec": 0.0237
     },
     {
       "condition": "Colored Env (~10 dB)",
@@ -106,7 +114,7 @@
       "is_clipped": false,
       "sample_rate": 16000,
       "duration_sec": 3.0,
-      "processing_time_sec": 0.017
+      "processing_time_sec": 0.0248
     }
   ]
 }

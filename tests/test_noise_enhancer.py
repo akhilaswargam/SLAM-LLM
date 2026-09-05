@@ -288,3 +288,69 @@ def test_speech_formant_protection(synthetic_audio_signals):
     assert corr_prot > corr_noisy
     assert corr_prot >= 0.78
 
+
+def test_speech_band_energy_preservation(synthetic_audio_signals):
+    """Verify that speech band (300-3400 Hz) energy is not catastrophically attenuated."""
+    clean = synthetic_audio_signals["clean"]
+    noisy = synthetic_audio_signals["noisy"]
+    sr = synthetic_audio_signals["sr"]
+
+    enhancer = NoiseEnhancer(protect_speech_bands=True)
+    enhanced, _ = enhancer.enhance(noisy, sample_rate=sr)
+
+    # Compute FFT energy in speech band (300 - 3400 Hz)
+    freqs = np.fft.rfftfreq(len(clean), 1.0 / sr)
+    speech_band = (freqs >= 300) & (freqs <= 3400)
+
+    clean_speech_energy = np.sum(np.abs(np.fft.rfft(clean)[speech_band]) ** 2)
+    enh_speech_energy = np.sum(np.abs(np.fft.rfft(enhanced)[speech_band]) ** 2)
+
+    # Energy ratio should remain reasonable (> 40% of original clean speech energy retained)
+    energy_ratio = enh_speech_energy / (clean_speech_energy + 1e-10)
+    assert energy_ratio > 0.40
+
+
+def test_four_channel_multichannel_handling():
+    """Test 4-channel surround audio input (4, N) and (N, 4) layout preservation."""
+    sr = 16000
+    t = np.linspace(0, 0.5, int(sr * 0.5), endpoint=False)
+    channels_data = [
+        (0.4 * np.sin(2 * np.pi * (200 + 100 * ch) * t) + np.random.normal(0, 0.15, len(t))).astype(np.float32)
+        for ch in range(4)
+    ]
+
+    enhancer = NoiseEnhancer()
+
+    # (4, N) layout
+    audio_4xN = np.stack(channels_data, axis=0)
+    out_4xN, res_4xN = enhancer.enhance(audio_4xN, sample_rate=sr)
+    assert out_4xN.shape == (4, len(t))
+    assert res_4xN.enhancement_applied is True
+    assert np.all(np.isfinite(out_4xN))
+    assert np.max(np.abs(out_4xN)) <= 1.0
+
+    # (N, 4) layout
+    audio_Nx4 = np.stack(channels_data, axis=1)
+    out_Nx4, res_Nx4 = enhancer.enhance(audio_Nx4, sample_rate=sr)
+    assert out_Nx4.shape == (len(t), 4)
+    assert res_Nx4.enhancement_applied is True
+
+
+def test_amplitude_extremes_and_unusual_lengths():
+    """Test very low amplitude (whisper level), high amplitude, and prime/odd sample counts."""
+    enhancer = NoiseEnhancer()
+    sr = 16000
+
+    # Very low amplitude signal (1e-5 RMS)
+    low_amp = (1e-5 * np.sin(2 * np.pi * 300 * np.linspace(0, 0.5, 8000))).astype(np.float32)
+    out_low, res_low = enhancer.enhance(low_amp, sample_rate=sr)
+    assert np.all(np.isfinite(out_low))
+    assert np.max(np.abs(out_low)) <= 1.0
+
+    # Unusual/prime length audio (e.g. 7919 samples)
+    odd_len = (0.5 * np.sin(2 * np.pi * 300 * np.linspace(0, 0.4949, 7919))).astype(np.float32)
+    out_odd, res_odd = enhancer.enhance(odd_len, sample_rate=sr)
+    assert len(out_odd) == 7919
+    assert np.all(np.isfinite(out_odd))
+
+

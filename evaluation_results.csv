@@ -1,7 +1,7 @@
 condition,file,noise_detected,noise_level,enhancement_applied,snr_before_db,snr_after_db,delta_snr_db,ref_correlation,peak_amplitude,is_clipped,sample_rate,duration_sec,processing_time_sec
-Clean Speech,1_clean.wav,False,Clean,False,89.33,89.33,0.0,1.0,0.7,False,16000,3.0,0.0158
-Low Stationary (~22 dB),2_low_noise.wav,False,Clean,False,27.24,27.24,0.0,0.9969,0.7209,False,16000,3.0,0.0041
-Moderate Stationary (~12 dB),3_moderate_noise.wav,True,Moderate,True,17.25,20.37,3.12,0.984,0.7986,False,16000,3.0,0.0186
-Strong Stationary (~3 dB),4_strong_noise.wav,True,Strong,True,8.89,11.81,2.92,0.8916,1.0,True,16000,3.0,0.0144
-Non-Stationary (~8 dB),5_nonstationary_noise.wav,True,Moderate,True,17.95,21.3,3.35,0.9411,1.0,True,16000,3.0,0.0155
-Colored Env (~10 dB),6_colored_environmental_noise.wav,True,Moderate,True,17.66,21.37,3.71,0.97,0.8109,False,16000,3.0,0.017
+Clean Speech,1_clean.wav,False,Clean,False,89.33,89.33,0.0,1.0,0.7,False,16000,3.0,0.0171
+Low Stationary (~22 dB),2_low_noise.wav,False,Clean,False,27.24,27.24,0.0,0.9969,0.7209,False,16000,3.0,0.006
+Moderate Stationary (~12 dB),3_moderate_noise.wav,True,Moderate,True,17.25,20.37,3.12,0.984,0.7986,False,16000,3.0,0.0197
+Strong Stationary (~3 dB),4_strong_noise.wav,True,Strong,True,8.89,11.81,2.92,0.8916,1.0,True,16000,3.0,0.0151
+Non-Stationary (~8 dB),5_nonstationary_noise.wav,True,Moderate,True,17.95,21.3,3.35,0.9411,1.0,True,16000,3.0,0.0237
+Colored Env (~10 dB),6_colored_environmental_noise.wav,True,Moderate,True,17.66,21.37,3.71,0.97,0.8109,False,16000,3.0,0.0248

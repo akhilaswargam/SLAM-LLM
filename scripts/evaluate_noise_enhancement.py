@@ -165,13 +165,28 @@ def run_evaluation(data_dir: str = None, threshold: float = 20.0, json_out: str 
     print("-" * 115)
 
     # Aggregate summary
+    enhanced_deltas = [r["delta_snr_db"] for r in results_data if r["enhancement_applied"]]
+    min_delta_snr = float(min(enhanced_deltas)) if enhanced_deltas else 0.0
+    max_delta_snr = float(max(enhanced_deltas)) if enhanced_deltas else 0.0
+    corrs = [r["ref_correlation"] for r in results_data]
+    min_corr = float(min(corrs)) if corrs else 0.0
+    max_corr = float(max(corrs)) if corrs else 0.0
+    total_audio_duration = sum(r["duration_sec"] for r in results_data)
+    rtf = (total_time / total_audio_duration) if total_audio_duration > 0 else 0.0
+    clipped_count = sum(1 for r in results_data if r["is_clipped"])
+
     avg_delta_snr_enhanced = (total_delta_snr / applied_count) if applied_count > 0 else 0.0
     summary = {
         "total_conditions_evaluated": len(results_data),
         "conditions_enhanced": applied_count,
         "clean_or_low_bypassed": len(results_data) - applied_count,
         "mean_snr_gain_enhanced_db": round(avg_delta_snr_enhanced, 2),
+        "min_delta_snr_db": round(min_delta_snr, 2),
+        "max_delta_snr_db": round(max_delta_snr, 2),
+        "ref_correlation_range": [round(min_corr, 4), round(max_corr, 4)],
+        "conditions_clipped": clipped_count,
         "mean_latency_sec": round(total_time / max(1, len(results_data)), 4),
+        "real_time_factor": round(rtf, 5),
         "asr_evaluation_status": asr_status_msg,
     }
 
@@ -179,8 +194,10 @@ def run_evaluation(data_dir: str = None, threshold: float = 20.0, json_out: str 
     print(f"  - Total conditions evaluated: {summary['total_conditions_evaluated']}")
     print(f"  - Conditions enhanced:        {summary['conditions_enhanced']}")
     print(f"  - Clean/low-noise bypassed:   {summary['clean_or_low_bypassed']}")
-    print(f"  - Mean SNR gain on enhanced:  {summary['mean_snr_gain_enhanced_db']:+.2f} dB")
-    print(f"  - Mean latency per file:      {summary['mean_latency_sec']:.4f} s")
+    print(f"  - Mean SNR gain on enhanced:  {summary['mean_snr_gain_enhanced_db']:+.2f} dB (min: {summary['min_delta_snr_db']:+.2f} dB, max: {summary['max_delta_snr_db']:+.2f} dB)")
+    print(f"  - Ref correlation range:      [{summary['ref_correlation_range'][0]:.4f}, {summary['ref_correlation_range'][1]:.4f}]")
+    print(f"  - Conditions with clipping:   {summary['conditions_clipped']}")
+    print(f"  - Mean latency per file:      {summary['mean_latency_sec']:.4f} s (RTF: {summary['real_time_factor']:.5f}x)")
     print("=" * 115)
 
     full_output = {
