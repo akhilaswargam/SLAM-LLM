@@ -97,18 +97,19 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
                 pbar = tqdm(colour="blue", desc=f"Training Epoch: {epoch+1}", total=total_length, dynamic_ncols=True)
             else:
                 pbar = tqdm(colour="blue", desc=f"Training Epoch: {epoch+1}", dynamic_ncols=True)
+            if train_config.enable_fsdp or train_config.enable_ddp:
+                target_device = local_rank
+            elif torch.cuda.is_available():
+                target_device = f"cuda:{local_rank}" if local_rank is not None else "cuda"
+            else:
+                target_device = "cpu"
+
             for step, batch in enumerate(train_dataloader):
                 for key in batch.keys():
-                    if train_config.enable_fsdp or train_config.enable_ddp:
-                        batch[key] = batch[key].to(local_rank) if isinstance(batch[key], torch.Tensor) else batch[key]
-                        if isinstance(batch[key], dict):
-                            for k2 in batch[key].keys():
-                                batch[key][k2] = batch[key][k2].to(local_rank) if isinstance(batch[key][k2], torch.Tensor) else batch[key][k2]
-                    else:
-                        batch[key] = batch[key].to('cuda:0') if isinstance(batch[key], torch.Tensor) else batch[key]
-                        if isinstance(batch[key], dict):
-                            for k2 in batch[key].keys():
-                                batch[key][k2] = batch[key][k2].to('cuda:0') if isinstance(batch[key][k2], torch.Tensor) else batch[key][k2]
+                    batch[key] = batch[key].to(target_device) if isinstance(batch[key], torch.Tensor) else batch[key]
+                    if isinstance(batch[key], dict):
+                        for k2 in batch[key].keys():
+                            batch[key][k2] = batch[key][k2].to(target_device) if isinstance(batch[key][k2], torch.Tensor) else batch[key][k2]
                 with autocast():
                     outputs, *rest = model(**batch)
                 acc = rest[0] if rest else -1
@@ -419,12 +420,19 @@ def evaluation(model,train_config, eval_dataloader, local_rank, tokenizer):
             pbar = tqdm(colour="green", desc=f"Evaluating Epoch", total=total_length, dynamic_ncols=True)
         else:
             pbar = tqdm(colour="green", desc=f"Evaluating Epoch",  dynamic_ncols=True)
+        if train_config.enable_fsdp or train_config.enable_ddp:
+            target_device = local_rank
+        elif torch.cuda.is_available():
+            target_device = f"cuda:{local_rank}" if local_rank is not None else "cuda"
+        else:
+            target_device = "cpu"
+
         for step, batch in enumerate(eval_dataloader):
             for key in batch.keys():
-                if train_config.enable_fsdp or train_config.enable_ddp:
-                    batch[key] = batch[key].to(local_rank) if isinstance(batch[key], torch.Tensor) else batch[key]
-                else:
-                    batch[key] = batch[key].to('cuda:0') if isinstance(batch[key], torch.Tensor) else batch[key]
+                batch[key] = batch[key].to(target_device) if isinstance(batch[key], torch.Tensor) else batch[key]
+                if isinstance(batch[key], dict):
+                    for k2 in batch[key].keys():
+                        batch[key][k2] = batch[key][k2].to(target_device) if isinstance(batch[key][k2], torch.Tensor) else batch[key][k2]
             # Ensure no gradients are computed for this scope to save memory
             with torch.no_grad():
                 # Forward pass and compute loss

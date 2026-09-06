@@ -1,5 +1,5 @@
-from src.slam_llm.models.vallex.vallex_config import VallexConfig
-from src.slam_llm.models.vallex.vallex_model import VALLE
+from slam_llm.models.vallex.vallex_config import VallexConfig
+from slam_llm.models.vallex.vallex_model import VALLE
 import torch
 import string
 import os

@@ -17,8 +17,11 @@ dynamic = ["dependencies"]
 
 [project.optional-dependencies]
 vllm = ["vllm"]
-tests = ["pytest-mock"]
+tests = ["pytest-mock", "pytest"]
 auditnlg = ["auditnlg"]
+deepspeed = ["deepspeed"]
+whisper = ["openai-whisper"]
+enhancement = ["soundfile", "scipy"]
 
 [project.urls]
 "Homepage" = "https://github.com/ddlBoJack/SLAM-LLM"

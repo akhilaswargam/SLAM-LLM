@@ -53,9 +53,12 @@ class Conv2dSubsampling(nn.Module):
         n_bands (int): Number of frequency bands.
     """
 
-    def __init__(self, idim, hdim, odim, strides=[2, 2], n_bands=64):
+    def __init__(self, idim, hdim, odim, strides=None, n_bands=64):
         """Construct an Conv2dSubsampling object."""
         super(Conv2dSubsampling, self).__init__()
+
+        if strides is None:
+            strides = [2, 2]
 
         self.conv = nn.Sequential(
             Res2dModule(idim, hdim, (2, strides[0])),

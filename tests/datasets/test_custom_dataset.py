@@ -4,7 +4,21 @@
 import pytest
 from unittest.mock import patch
 
-from transformers import LlamaTokenizer
+try:
+    from transformers import LlamaTokenizer
+except ImportError:
+    LlamaTokenizer = None
+
+try:
+    import llama_recipes.finetuning
+    has_llama_recipes = True
+except ImportError:
+    has_llama_recipes = False
+
+if LlamaTokenizer is None:
+    pytest.skip("transformers is not installed", allow_module_level=True)
+if not has_llama_recipes:
+    pytest.skip("llama_recipes is not installed", allow_module_level=True)
 
 def check_padded_entry(batch):
     seq_len = sum(batch["attention_mask"][0])

@@ -7,12 +7,12 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 from fairseq.data import Dictionary
-from src.slam_llm.models.vallex.transformers import (
+from slam_llm.models.vallex.transformers import (
     LayerNorm,
     TransformerEncoder,
     TransformerEncoderLayer,
 )
-from src.slam_llm.models.vallex.vallex_config import VallexConfig
+from slam_llm.models.vallex.vallex_config import VallexConfig
 from transformers.modeling_utils import PreTrainedModel
 from transformers import AutoConfig, AutoModel, AutoModelForImageClassification
 from dataclasses import dataclass
@@ -706,9 +706,12 @@ class EncodecDecoderLstm(nn.Module):
     def __init__(self, dictionary, emb_dim, 
                  out_dim=None,
                  num_layers=3, lstm_skip=True, lstm_bidire=False,
-                 activation_param={'alpha': 1.0}, **kwargs):
+                 activation_param=None, **kwargs):
         super().__init__()
         
+        if activation_param is None:
+            activation_param = {'alpha': 1.0}
+
         # Identity()
         if out_dim is None:
             out_dim = emb_dim
@@ -733,9 +736,12 @@ class NATEncodecDecoderLstm(nn.Module):
     def __init__(self, codecs, dictionary, emb_dim, 
                  out_dim=None,
                  num_layers=3, lstm_skip=True, lstm_bidire=False,
-                 activation_param={'alpha': 1.0}, **kwargs):
+                 activation_param=None, **kwargs):
         super().__init__()
         
+        if activation_param is None:
+            activation_param = {'alpha': 1.0}
+
         # Identity()
         if out_dim is None:
             out_dim = emb_dim

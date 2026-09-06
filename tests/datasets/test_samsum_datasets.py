@@ -2,7 +2,17 @@
 # This software may be used and distributed according to the terms of the Llama 2 Community License Agreement.
 
 from functools import partial
+import pytest
 from unittest.mock import patch
+
+try:
+    import llama_recipes.finetuning
+    has_llama_recipes = True
+except ImportError:
+    has_llama_recipes = False
+
+if not has_llama_recipes:
+    pytest.skip("llama_recipes is not installed", allow_module_level=True)
 
 
 @patch('llama_recipes.finetuning.train')

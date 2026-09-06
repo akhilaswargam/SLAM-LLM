@@ -1,18 +1,18 @@
-# import fire
 import logging
 import random
-import torch
-# import argparse
-from slam_llm.models.slam_model import slam_model
-# config
-# from llama_recipes.configs import fsdp_config as FSDP_CONFIG
-# from llama_recipes.configs import train_config as TRAIN_CONFIG
-# from llama_recipes.configs import model_config as MODEL_CONFIG
+try:
+    import torch
+except ImportError:
+    torch = None
 
+logger = logging.getLogger(__name__)
+
+from slam_llm.models.slam_model import slam_model
 from slam_llm.utils.model_utils import get_custom_model_factory
 
 import hydra
 from omegaconf import DictConfig, ListConfig, OmegaConf
+
 
 
 @hydra.main(config_name=None, version_base=None)

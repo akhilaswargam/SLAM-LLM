@@ -5,13 +5,26 @@ import pytest
 from pytest import approx
 from unittest.mock import patch
 
-from torch.nn import Linear
-from torch.optim import AdamW
-from torch.utils.data.dataloader import DataLoader
-from torch.utils.data.sampler import BatchSampler
+try:
+    import torch
+    from torch.nn import Linear
+    from torch.optim import AdamW
+    from torch.utils.data.dataloader import DataLoader
+    from torch.utils.data.sampler import BatchSampler
+    from slam_llm.data.sampler import LengthBasedBatchSampler
+except ImportError:
+    torch = None
 
-from slam_llm.finetuning import main
-from slam_llm.data.sampler import LengthBasedBatchSampler
+try:
+    import llama_recipes.finetuning
+    has_llama_recipes = True
+except ImportError:
+    has_llama_recipes = False
+
+if torch is None:
+    pytest.skip("torch is not installed", allow_module_level=True)
+if not has_llama_recipes:
+    pytest.skip("llama_recipes is not installed", allow_module_level=True)
 
 
 def get_fake_dataset():

@@ -4,10 +4,17 @@
 import random
 import pytest
 
-import torch
+try:
+    import torch
+    from slam_llm.data.sampler import LengthBasedBatchSampler
+    from slam_llm.data.sampler import DistributedLengthBasedBatchSampler
+except ImportError:
+    torch = None
+    LengthBasedBatchSampler = None
+    DistributedLengthBasedBatchSampler = None
 
-from slam_llm.data.sampler import LengthBasedBatchSampler
-from slam_llm.data.sampler import DistributedLengthBasedBatchSampler
+if torch is None:
+    pytest.skip("torch is not installed", allow_module_level=True)
 
 SAMPLES = 33
 

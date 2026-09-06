@@ -64,38 +64,38 @@ def compute_wer(ref_file,
             value = line.strip().split()[1:]
             ref_dict[key] = value
 
-    cer_detail_writer = open(cer_detail_file, 'w')
-    for hyp_key in hyp_dict:
-        if hyp_key in ref_dict:
-            out_item = compute_wer_by_line(hyp_dict[hyp_key], ref_dict[hyp_key])
-            # if out_item['ins'] > 10 or out_item['del'] > 10:
-            #     print(hyp_key + print_cer_detail(out_item))
-            #     print("ref:" + '\t' + " ".join(list(map(lambda x: x.lower(), ref_dict[hyp_key]))))
-            #     print("hyp:" + '\t' + " ".join(list(map(lambda x: x.lower(), hyp_dict[hyp_key]))))
-            rst['Wrd'] += out_item['nwords']
-            rst['Corr'] += out_item['cor']
-            rst['wrong_words'] += out_item['wrong']
-            rst['Ins'] += out_item['ins']
-            rst['Del'] += out_item['del']
-            rst['Sub'] += out_item['sub']
-            rst['Snt'] += 1
-            if out_item['wrong'] > 0:
-                rst['wrong_sentences'] += 1
-            cer_detail_writer.write(hyp_key + print_cer_detail(out_item) + '\n')
-            cer_detail_writer.write("ref:" + '\t' + " ".join(list(map(lambda x: x.lower(), ref_dict[hyp_key]))) + '\n')
-            cer_detail_writer.write("hyp:" + '\t' + " ".join(list(map(lambda x: x.lower(), hyp_dict[hyp_key]))) + '\n')
-            cer_detail_writer.write("diff:" + '\t' + build_diff(ref_dict[hyp_key], hyp_dict[hyp_key], out_item['path']) + '\n')
+    with open(cer_detail_file, 'w') as cer_detail_writer:
+        for hyp_key in hyp_dict:
+            if hyp_key in ref_dict:
+                out_item = compute_wer_by_line(hyp_dict[hyp_key], ref_dict[hyp_key])
+                # if out_item['ins'] > 10 or out_item['del'] > 10:
+                #     print(hyp_key + print_cer_detail(out_item))
+                #     print("ref:" + '\t' + " ".join(list(map(lambda x: x.lower(), ref_dict[hyp_key]))))
+                #     print("hyp:" + '\t' + " ".join(list(map(lambda x: x.lower(), hyp_dict[hyp_key]))))
+                rst['Wrd'] += out_item['nwords']
+                rst['Corr'] += out_item['cor']
+                rst['wrong_words'] += out_item['wrong']
+                rst['Ins'] += out_item['ins']
+                rst['Del'] += out_item['del']
+                rst['Sub'] += out_item['sub']
+                rst['Snt'] += 1
+                if out_item['wrong'] > 0:
+                    rst['wrong_sentences'] += 1
+                cer_detail_writer.write(hyp_key + print_cer_detail(out_item) + '\n')
+                cer_detail_writer.write("ref:" + '\t' + " ".join(list(map(lambda x: x.lower(), ref_dict[hyp_key]))) + '\n')
+                cer_detail_writer.write("hyp:" + '\t' + " ".join(list(map(lambda x: x.lower(), hyp_dict[hyp_key]))) + '\n')
+                cer_detail_writer.write("diff:" + '\t' + build_diff(ref_dict[hyp_key], hyp_dict[hyp_key], out_item['path']) + '\n')
 
-    if rst['Wrd'] > 0:
-        rst['Err'] = round(rst['wrong_words'] * 100 / rst['Wrd'], 2)
-    if rst['Snt'] > 0:
-        rst['S.Err'] = round(rst['wrong_sentences'] * 100 / rst['Snt'], 2)
+        if rst['Wrd'] > 0:
+            rst['Err'] = round(rst['wrong_words'] * 100 / rst['Wrd'], 2)
+        if rst['Snt'] > 0:
+            rst['S.Err'] = round(rst['wrong_sentences'] * 100 / rst['Snt'], 2)
 
-    cer_detail_writer.write('\n')
-    cer_detail_writer.write("%WER " + str(rst['Err']) + " [ " + str(rst['wrong_words'])+ " / " + str(rst['Wrd']) +
-                            ", " + str(rst['Ins']) + " ins, " + str(rst['Del']) + " del, " + str(rst['Sub']) + " sub ]" + '\n')
-    cer_detail_writer.write("%SER " + str(rst['S.Err']) + " [ " + str(rst['wrong_sentences']) + " / " + str(rst['Snt']) + " ]" + '\n')
-    cer_detail_writer.write("Scored " + str(len(hyp_dict)) + " sentences, " + str(len(hyp_dict) - rst['Snt']) + " not present in hyp." + '\n')
+        cer_detail_writer.write('\n')
+        cer_detail_writer.write("%WER " + str(rst['Err']) + " [ " + str(rst['wrong_words'])+ " / " + str(rst['Wrd']) +
+                                ", " + str(rst['Ins']) + " ins, " + str(rst['Del']) + " del, " + str(rst['Sub']) + " sub ]" + '\n')
+        cer_detail_writer.write("%SER " + str(rst['S.Err']) + " [ " + str(rst['wrong_sentences']) + " / " + str(rst['Snt']) + " ]" + '\n')
+        cer_detail_writer.write("Scored " + str(len(hyp_dict)) + " sentences, " + str(len(hyp_dict) - rst['Snt']) + " not present in hyp." + '\n')
 
      
 def compute_wer_by_line(hyp,

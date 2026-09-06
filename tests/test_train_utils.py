@@ -2,15 +2,22 @@
 # This software may be used and distributed according to the terms of the Llama 2 Community License Agreement.
 
 from unittest.mock import patch
+import pytest
 
-import torch
+try:
+    import torch
+    from slam_llm.utils.train_utils import train
+except ImportError:
+    torch = None
+    train = None
 
-from slam_llm.utils.train_utils import train
+if torch is None:
+    pytest.skip("torch is not installed", allow_module_level=True)
 
-@patch("llama_recipes.utils.train_utils.MemoryTrace")
-@patch("llama_recipes.utils.train_utils.nullcontext")
-@patch("llama_recipes.utils.train_utils.torch.cuda.amp.GradScaler")
-@patch("llama_recipes.utils.train_utils.torch.cuda.amp.autocast")
+@patch("slam_llm.utils.train_utils.MemoryTrace")
+@patch("slam_llm.utils.train_utils.nullcontext")
+@patch("slam_llm.utils.train_utils.torch.cuda.amp.GradScaler")
+@patch("slam_llm.utils.train_utils.torch.cuda.amp.autocast")
 def test_gradient_accumulation(autocast, scaler, nullcontext, mem_trace, mocker):
     
     model = mocker.MagicMock(name="model")

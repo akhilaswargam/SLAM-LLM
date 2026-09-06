@@ -6,8 +6,6 @@ from datetime import datetime
 import torch
 import time
 from collections import OrderedDict
-from deepspeed.utils.zero_to_fp32 import (
-    convert_zero_checkpoint_to_fp32_state_dict)
 from torch.distributed.fsdp import (
     FullyShardedDataParallel as FSDP,
     StateDictType,
@@ -167,6 +165,11 @@ def save_model_checkpoint(
         logger.info(f"model checkpoint saved for epoch {epoch} at {save_full_path}\n")
 
 def save_model_checkpoint_deepspeed(model, cfg, checkpoint_name="checkpoint"):
+    try:
+        from deepspeed.utils.zero_to_fp32 import convert_zero_checkpoint_to_fp32_state_dict
+    except ImportError as e:
+        raise ImportError("DeepSpeed is required for save_model_checkpoint_deepspeed but is not installed.") from e
+
     logger.info(f"--> saving model ...")
     save_dir = os.path.join(cfg.output_dir, checkpoint_name)
     dist.barrier()

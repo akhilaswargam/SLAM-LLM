@@ -39,7 +39,7 @@ class MusicFM25Hz(nn.Module):
         num_codebooks=1,
         codebook_dim=16,
         codebook_size=4096,
-        features=["melspec_2048"],
+        features=None,
         hop_length=240,
         n_mels=128,
         conv_dim=512,
@@ -53,6 +53,9 @@ class MusicFM25Hz(nn.Module):
         w2v2_config_path="facebook/wav2vec2-conformer-rope-large-960h-ft",
     ):
         super(MusicFM25Hz, self).__init__()
+
+        if features is None:
+            features = ["melspec_2048"]
 
         # global variables
         self.hop_length = hop_length

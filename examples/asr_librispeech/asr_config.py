@@ -119,12 +119,14 @@ class FSDPConfig:
     pure_bf16: bool = False
     optimizer: str = "AdamW"
 
+import os
+
 @dataclass
 class LogConfig:
     use_wandb: bool = False
-    wandb_dir: str = "/root/test_wandb"
+    wandb_dir: str = os.environ.get("WANDB_DIR", "./test_wandb")
     wandb_entity_name: str = "project_name"
     wandb_project_name: str = "project_name"
     wandb_exp_name: str = "exp_name"
-    log_file: str = "/root/test.log"
+    log_file: str = os.environ.get("LOG_FILE", "./test.log")
     log_interval: int = 5

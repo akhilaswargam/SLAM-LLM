@@ -133,8 +133,8 @@ def setup_llm(train_config, model_config, **kwargs):
         rank = int(os.environ["RANK"])
         if rank == 0:
             if "vallex" in model_config.llm_name.lower():
-                from src.slam_llm.models.vallex.vallex_config import VallexConfig
-                from src.slam_llm.models.vallex.vallex_model import VALLE
+                from slam_llm.models.vallex.vallex_config import VallexConfig
+                from slam_llm.models.vallex.vallex_model import VALLE
                 vallex_config = VallexConfig(
                     **model_config
                 )
@@ -164,8 +164,8 @@ def setup_llm(train_config, model_config, **kwargs):
 
     else:
         if "vallex" in model_config.llm_name.lower():
-            from src.slam_llm.models.vallex.vallex_config import VallexConfig
-            from src.slam_llm.models.vallex.vallex_model import VALLE
+            from slam_llm.models.vallex.vallex_config import VallexConfig
+            from slam_llm.models.vallex.vallex_model import VALLE
             vallex_config = VallexConfig(
                 **model_config
             )

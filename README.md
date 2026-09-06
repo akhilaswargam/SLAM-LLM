@@ -70,25 +70,30 @@ developers to train custom multimodal large language model (MLLM), focusing on <
 
 # Installation
 ```bash
-git clone https://github.com/huggingface/transformers.git
-cd transformers
-git checkout tags/v4.35.2
-pip install -e .
-cd ..
-git clone https://github.com/huggingface/peft.git
-cd peft
-git checkout tags/v0.6.0
-pip install -e .
-cd ..
+# 1. Install PyTorch with your platform's CUDA support (example: CUDA 11.8):
 pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cu118
+
+# 2. Clone and install SLAM-LLM (core dependencies):
 git clone https://github.com/ddlBoJack/SLAM-LLM.git
 cd SLAM-LLM
-pip install  -e .
+pip install -e .
 ```
 
-For some examples, you may need to use `fairseq`, the command line is as follows:
+### Optional Dependencies
+Depending on the recipes and features you wish to use, install optional extras:
+```bash
+# For DeepSpeed distributed training:
+pip install -e ".[deepspeed]"
+
+# For Whisper-based recipes:
+pip install -e ".[whisper]"
+
+# For Noise Enhancement and audio processing:
+pip install -e ".[enhancement]"
 ```
-# you need to install fairseq before SLAM-LLM
+
+For some examples, you may need to use `fairseq`:
+```bash
 git clone https://github.com/pytorch/fairseq
 cd fairseq
 pip install --editable ./
