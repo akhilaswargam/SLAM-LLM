@@ -45,7 +45,10 @@ def main_hydra(cfg: DictConfig):
 
 def main(kwargs: DictConfig):
 
-    # Get configuration sections
+    # ============================================================
+    # GET CONFIGURATION
+    # ============================================================
+
     train_config = kwargs.train_config
     fsdp_config = kwargs.fsdp_config
     model_config = kwargs.model_config
@@ -59,12 +62,20 @@ def main(kwargs: DictConfig):
     del kwargs.log_config
     del kwargs.dataset_config
 
-    # Set seeds for reproducibility
+    # ============================================================
+    # SET RANDOM SEEDS
+    # ============================================================
+
     torch.cuda.manual_seed(train_config.seed)
     torch.manual_seed(train_config.seed)
     random.seed(train_config.seed)
 
-    # Create model
+    # ============================================================
+    # CREATE SLAM-LLM MODEL
+    # ============================================================
+
+    print("\nLoading SLAM-LLM model...")
+
     model_factory = get_custom_model_factory(
         model_config,
         logger
@@ -76,18 +87,32 @@ def main(kwargs: DictConfig):
         **kwargs
     )
 
-    # Select device
+    # ============================================================
+    # SELECT DEVICE
+    # ============================================================
+
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "cpu"
     )
 
-    # Move model to device
+    print(f"Using device: {device}")
+
+    # ============================================================
+    # MOVE MODEL TO DEVICE
+    # ============================================================
+
     model.to(device)
     model.eval()
+
+    print("SLAM-LLM model loaded successfully.")
 
     # ============================================================
     # SMARTSLAM RAG INITIALIZATION
     # ============================================================
+
+    print("\n========================================")
+    print("SMARTSLAM RAG INITIALIZATION")
+    print("========================================")
 
     rag = RAGRetriever()
 
@@ -105,41 +130,56 @@ def main(kwargs: DictConfig):
 
     while True:
 
-        print("\n==============================")
-        print("       SMARTSLAM INFERENCE")
-        print("==============================")
+        print("\n========================================")
+        print("          SMARTSLAM INFERENCE")
+        print("========================================")
 
         wav_path = input("Your Wav Path:\n")
         prompt = input("Your Prompt:\n")
 
+        # Allow user to exit
+        if prompt.lower() in ["exit", "quit"]:
+            print("Exiting SmartSLAM inference.")
+            break
+
         try:
 
-            # ----------------------------------------------------
+            # ====================================================
             # 1. RAG RETRIEVAL
-            # ----------------------------------------------------
+            # ====================================================
+
+            print("\n[1] Retrieving relevant knowledge...")
 
             retrieved_results = rag.retrieve(
                 prompt,
                 top_k=3
             )
 
-            # ----------------------------------------------------
+            # ====================================================
             # 2. BUILD AUGMENTED PROMPT
-            # ----------------------------------------------------
+            # ====================================================
+
+            print("[2] Building evidence-grounded prompt...")
 
             augmented_prompt = rag.build_augmented_prompt(
                 prompt,
                 retrieved_results
             )
 
-            # ----------------------------------------------------
+            # ====================================================
             # 3. GENERATE ANSWER USING SLAM-LLM
-            # ----------------------------------------------------
+            # ====================================================
+
+            print("[3] Generating answer using SLAM-LLM...")
 
             model_outputs = model.inference(
                 wav_path,
                 augmented_prompt
             )
+
+            # ====================================================
+            # 4. DECODE MODEL OUTPUT
+            # ====================================================
 
             output_text = model.tokenizer.batch_decode(
                 model_outputs,
@@ -147,56 +187,71 @@ def main(kwargs: DictConfig):
                 skip_special_tokens=True
             )
 
-            # ----------------------------------------------------
-            # 4. DISPLAY ANSWER
-            # ----------------------------------------------------
+            print("\n========================================")
+            print("          SMARTSLAM ANSWER")
+            print("========================================")
 
-            print("\n=== SMARTSLAM ANSWER ===")
             print(output_text)
 
-            # ----------------------------------------------------
-            # 5. EXPLAINABLE AI - RETRIEVED EVIDENCE
-            # ----------------------------------------------------
+            # ====================================================
+            # 5. XAI - RETRIEVED EVIDENCE
+            # ====================================================
 
-            print("\n=== RETRIEVED EVIDENCE ===")
+            print("\n========================================")
+            print("       RETRIEVED EVIDENCE (XAI)")
+            print("========================================")
 
             if retrieved_results:
 
                 for result in retrieved_results:
 
                     print(
-                        f"Source: {result['source']} | "
-                        f"Chunk: {result['chunk_id']} | "
-                        f"Similarity: "
+                        f"\nSource      : {result['source']}"
+                    )
+
+                    print(
+                        f"Chunk ID    : {result['chunk_id']}"
+                    )
+
+                    print(
+                        f"Similarity  : "
                         f"{result['similarity']:.4f}"
                     )
 
                     print(
-                        f"Evidence: {result['text']}\n"
+                        f"Evidence    : "
+                        f"{result['text']}"
                     )
 
             else:
 
                 print(
-                    "No relevant evidence retrieved."
+                    "No relevant evidence was retrieved."
                 )
 
-            # ----------------------------------------------------
+            # ====================================================
             # 6. CONFIDENCE ESTIMATION
-            # ----------------------------------------------------
+            # ====================================================
 
             confidence = rag.confidence(
                 retrieved_results
             )
 
-            print("=== CONFIDENCE ===")
-            print(f"{confidence:.4f}")
+            print("\n========================================")
+            print("          CONFIDENCE SCORE")
+            print("========================================")
 
-            # ----------------------------------------------------
+            print(
+                f"{confidence:.4f}"
+            )
+
+            # ====================================================
             # 7. XAI EXPLANATION
-            # ----------------------------------------------------
+            # ====================================================
 
-            print("\n=== XAI EXPLANATION ===")
+            print("\n========================================")
+            print("          XAI EXPLANATION")
+            print("========================================")
 
             print(
                 rag.explain(
@@ -204,18 +259,31 @@ def main(kwargs: DictConfig):
                 )
             )
 
-            # ----------------------------------------------------
-            # 8. SHOW AUGMENTED PROMPT
-            # ----------------------------------------------------
+            # ====================================================
+            # 8. SUPPORT STATUS
+            # ====================================================
 
-            print("\n=== AUGMENTED PROMPT ===")
-            print(augmented_prompt)
+            print("\n========================================")
+            print("          SUPPORT STATUS")
+            print("========================================")
+
+            if retrieved_results:
+                print(
+                    "Supporting evidence was found "
+                    "in the knowledge base."
+                )
+            else:
+                print(
+                    "Available evidence is insufficient."
+                )
 
         except Exception as e:
 
-            print(
-                f"\nRAG inference error: {e}"
-            )
+            print("\n========================================")
+            print("          SMARTSLAM ERROR")
+            print("========================================")
+
+            print(f"RAG inference error: {e}")
 
             continue
 

@@ -206,7 +206,7 @@ class RAGRetriever:
         self,
         query,
         top_k: int = 3,
-        min_score: float = 0.05,
+        min_score: float = 0.15,
     ):
         """
         Retrieve the most relevant document chunks using
