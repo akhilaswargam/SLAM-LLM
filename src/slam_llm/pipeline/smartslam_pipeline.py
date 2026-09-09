@@ -106,6 +106,85 @@ class SmartSLAMPipeline:
             ),
         }
 
+    def inference(
+        self,
+        wav_path,
+        prompt,
+        train_config,
+        model_config,
+        dataset_config,
+        top_k=3,
+        logger=None,
+        device=None,
+        **kwargs,
+    ):
+        """
+        Run the complete SmartSLAM inference flow.
+
+        Routing is performed before model construction so that only the
+        selected SLAM-LLM encoder/model path is instantiated.
+        """
+        if logger is None:
+            import logging
+            logger = logging.getLogger(__name__)
+
+        if device is None:
+            import torch
+            device = torch.device(
+                "cuda" if torch.cuda.is_available() else "cpu"
+            )
+
+        result = self.prepare(
+            wav_path=wav_path,
+            prompt=prompt,
+            model_config=model_config,
+            dataset_config=dataset_config,
+            top_k=top_k,
+        )
+
+        try:
+            routed_model_config = result["dispatch"]["model_config"]
+            routed_dataset_config = result["dispatch"]["dataset_config"]
+            from slam_llm.utils.model_utils import get_custom_model_factory
+
+            model_factory = get_custom_model_factory(
+                routed_model_config,
+                logger,
+            )
+
+            model, tokenizer = model_factory(
+                train_config,
+                routed_model_config,
+                dataset_config=routed_dataset_config,
+                **kwargs,
+            )
+
+            model.to(device)
+            model.eval()
+
+            model_outputs = model.inference(
+                wav_path=result["enhanced_wav"],
+                prompt=result["augmented_prompt"],
+                dataset_config=routed_dataset_config,
+                device=device,
+            )
+
+            output_text = tokenizer.batch_decode(
+                model_outputs,
+                add_special_tokens=False,
+                skip_special_tokens=True,
+            )
+
+            result["model_outputs"] = model_outputs
+            result["output_text"] = output_text
+            result["model"] = model
+            result["tokenizer"] = tokenizer
+
+            return result
+        except Exception:
+            self.cleanup(result)
+            raise
+
     def cleanup(self, result):
         """Remove the temporary enhanced WAV created by prepare()."""
         enhanced_wav = result.get("enhanced_wav")
