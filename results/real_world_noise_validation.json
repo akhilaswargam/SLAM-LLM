@@ -1,0 +1,34 @@
+[
+  {
+    "scenario": "Clean Studio Speech",
+    "noise_level": "Clean",
+    "snr_before_db": 36.33,
+    "snr_after_db": 36.33,
+    "gain_db": 0.0,
+    "enhancement_applied": false
+  },
+  {
+    "scenario": "Office HVAC Background (~15 dB)",
+    "noise_level": "Moderate",
+    "snr_before_db": 18.59,
+    "snr_after_db": 22.69,
+    "gain_db": 4.1,
+    "enhancement_applied": true
+  },
+  {
+    "scenario": "Cafeteria / Babble Ambient (~10 dB)",
+    "noise_level": "Moderate",
+    "snr_before_db": 14.03,
+    "snr_after_db": 22.17,
+    "gain_db": 8.14,
+    "enhancement_applied": true
+  },
+  {
+    "scenario": "Street / Traffic Environmental (~8 dB)",
+    "noise_level": "Moderate",
+    "snr_before_db": 18.52,
+    "snr_after_db": 22.6,
+    "gain_db": 4.08,
+    "enhancement_applied": true
+  }
+]

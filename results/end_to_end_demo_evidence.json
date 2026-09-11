@@ -1,0 +1,63 @@
+{
+  "raw_speech": {
+    "source": "examples/s2s/audio_prompt/en/prompt_1.wav",
+    "duration_sec": 3.435,
+    "sample_rate": 16000
+  },
+  "noise_estimation": {
+    "noise_detected": true,
+    "noise_level": "Moderate",
+    "estimated_snr_db": 15.76,
+    "noise_power": 0.0011671201627461076
+  },
+  "noise_enhancement": {
+    "input_path": null,
+    "output_path": null,
+    "noise_detected": true,
+    "noise_level": "Moderate",
+    "estimated_snr_before": 15.76,
+    "estimated_snr_after": 19.4,
+    "enhancement_applied": true,
+    "method": "Adaptive Spectral Gating",
+    "sample_rate": 16000,
+    "processing_time": 0.0151,
+    "duration_sec": 3.435
+  },
+  "pytorch_tensor": {
+    "shape": [
+      1,
+      54955
+    ],
+    "dtype": "torch.float32",
+    "device": "cpu"
+  },
+  "routing_result": {
+    "modality": "speech",
+    "encoder": "whisper",
+    "confidence": 1.0,
+    "reasoning": [
+      "Relatively high overall audio energy supports speech",
+      "Zero-crossing rate is compatible with speech",
+      "Spectral centroid overlaps with a speech-like range",
+      "High temporal energy variation supports speech",
+      "Combined acoustic evidence favors speech"
+    ],
+    "features": {
+      "rms": 0.15286080539226532,
+      "peak": 0.7459891438484192,
+      "zero_crossing_rate": 0.07370710372924805,
+      "spectral_centroid_hz": 2432.4491996162765,
+      "frame_rms_mean": 0.1408546417951584,
+      "frame_rms_std": 0.06112008914351463,
+      "duration_seconds": 3.4346875
+    },
+    "slam_llm_profile": {
+      "encoder_name": "whisper",
+      "encoder_dim": 1280,
+      "encoder_projector": "linear",
+      "encoder_projector_ds_rate": 5,
+      "input_type": "mel",
+      "mel_size": 128
+    }
+  }
+}

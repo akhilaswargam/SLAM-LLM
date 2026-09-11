@@ -145,6 +145,7 @@ command-line (shell file) > Hydra configuration (yaml file) > dataclass configur
 ```
 
 # Features
+- **SmartSLAM Noise-Aware Audio Enhancement**: Standalone, explainable noise detection, SNR estimation, and adaptive spectral gating with speech formant protection ([Documentation](docs/noise_enhancement.md)).
 - Easily extend to new models and tasks.
 - Detailed recipes for training and high-performance checkpoints for inference.
 - Mixed precision training which trains faster with less GPU memory on NVIDIA tensor cores. 
